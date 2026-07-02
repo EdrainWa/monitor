@@ -1,0 +1,28 @@
+name: ETF
+on:
+  workflow_dispatch:
+  # schedule:
+  #   # GitHub Actions 使用的是UTC时间，比北京时间慢八个小时
+  #   # 每半小时运行一次，覆盖北京时间 9:33~14:33 和 10:03~15:03，周一到周五
+  #   # UTC 1:33~6:33 → 北京 9:33~14:33
+  #   # UTC 2:03~7:03 → 北京 10:03~15:03
+  #   - cron: '33 1-6 * * 1-5'
+  #   - cron: '3 2-7 * * 1-5'
+
+jobs:
+  LOF:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v6
+      with:
+        python-version: 3.11
+        cache: 'pip'
+    - name: Install dependencies
+      run: |
+        python -m pip install -r requirements.txt
+    - name: Run ETF script
+      run: |
+        sed -i "s/ServerChanKey/${{ secrets.ServerChanKey }}/g" config.cfg
+        python ./etf.py
