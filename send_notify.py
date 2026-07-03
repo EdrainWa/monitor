@@ -20,4 +20,4 @@ def send_email(subject, content, to_addr):
         server.sendmail(from_addr, [to_addr], msg.as_string())
 
 
-send_email("Job Completed", "任务状态:成功", os.environ["to_addr"])
+send_email("Job Completed", "任务状态:成功", os.environ["TO_ADDR"])
