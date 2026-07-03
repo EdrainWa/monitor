@@ -47,7 +47,7 @@ class ETF:
 
     def md(self, info):
         if not info:
-            return
+            return None
         res = ["| " + " | ".join(list(info[0])) + " |", "| " + " :---: | " * (len(info[0]) - 1) + " :---: |"]
         res.extend("| " + " | ".join(list(i.values())) + " |" for i in info)
         return "\n".join(res)
