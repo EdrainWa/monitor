@@ -53,7 +53,7 @@ class ETF:
     def message(self, key, title, body):
         msg_url = f"https://sctapi.ftqq.com/{key}.send"
         print("Sending to:", msg_url)
-        # r = requests.post(msg_url, data={"title": title, "desp": body})
+        r = requests.post(msg_url, data={"title": title, "desp": body})
         print("Push result:", r.status_code, r.text)
 
     def main(self):

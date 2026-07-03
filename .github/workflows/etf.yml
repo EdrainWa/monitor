@@ -10,7 +10,7 @@ on:
   #   - cron: '3 2-7 * * 1-5'
 
 jobs:
-  LOF:
+  ETF:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
