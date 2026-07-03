@@ -1,7 +1,10 @@
 import akshare as ak
-import requests
+import os
+import smtplib
 import json
 import configparser
+from email.mime.text import MIMEText
+from email.header import Header
 
 
 class ETF:
@@ -12,7 +15,6 @@ class ETF:
             raise Exception("Please add [ETF] section to config.cfg first")
         # {"510300": 2.0, "510100": 1.0}
         self.ETFThreshold = json.loads(self.cp.get('ETF', 'ETFThreshold'))
-        self.apiKey = self.cp.get('ETF', 'apiKey')
 
     def get_info(self):
         df = ak.fund_etf_spot_em()
@@ -50,24 +52,31 @@ class ETF:
         res.extend("| " + " | ".join(list(i.values())) + " |" for i in info)
         return "\n".join(res)
 
-    def message(self, key, title, body):
-        msg_url = f"https://sctapi.ftqq.com/{key}.send"
-        print("Sending to:", msg_url)
-        r = requests.post(msg_url, data={"title": title, "desp": body})
-        print("Push result:", r.status_code, r.text)
+    def message(self, title, body):
+        smtp_server = os.environ["SMTP_SERVER"]
+        smtp_port = int(os.environ["SMTP_PORT"])
+        from_addr = os.environ["FROM_ADDR"]
+        app_password = os.environ["APP_PASSWORD"]
+        to_addr = os.environ["TO_ADDR"]
+
+        msg = MIMEText(body, "plain", "utf-8")
+        msg["Subject"] = Header(title, "utf-8")
+        msg["From"] = from_addr
+        msg["To"] = to_addr
+
+        with smtplib.SMTP(smtp_server, smtp_port) as server:
+            server.starttls()
+            server.login(from_addr, app_password)
+            server.sendmail(from_addr, [to_addr], msg.as_string())
+        print("Email sent:", title)
 
     def main(self):
         info = self.get_info()
         print("Info count:", len(info))
         if info:
             md = self.md(info)
-            # title = "ETF: " + ", ".join([f"{item['代码']}-溢价率{item['溢价率%']}%" for item in info])
             title = ", ".join([f"{item['代码']}-溢价率{item['溢价率%']}%" for item in info])
-            self.message(
-                self.apiKey,
-                title,
-                md,
-            )
+            self.message(title, md)
 
 
 if __name__ == "__main__":
