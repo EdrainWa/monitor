@@ -1,0 +1,24 @@
+name: Send Job Notification
+
+on:
+  workflow_dispatch:
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Run notification script
+        env:
+          SMTP_SERVER: ${{ secrets.SMTP_SERVER }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          FROM_ADDR: ${{ secrets.FROM_ADDR }}
+          APP_PASSWORD: ${{ secrets.APP_PASSWORD }}
+        run: python send_notify.py
